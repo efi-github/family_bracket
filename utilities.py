@@ -14,6 +14,7 @@ green = "#90EE90"
 red = "#FF7377"
 grey = "#cfc9c4"
 blue = "#ECECFD"
+
 def mermaid(code: str) -> None:
     components.html(
         f"""
@@ -227,22 +228,3 @@ def submit_player_data():
 def process_username():
     st.session_state["live_data"] = load_live_data()
     st.session_state["player"] = get_player(st.session_state["username"])
-
-st.set_page_config(
-    page_title="Guess",
-    page_icon="🤔",
-)
-
-st.write("# Guess the Bracket!")
-st.text_input("Please enter a nickname to start", key="username", on_change=process_username)
-
-
-if "player" in st.session_state and len(st.session_state["username"]) >0:
-    st.session_state["live_data"] = load_live_data()
-    update_player()
-    display_player_bracket(st.session_state["player"])
-    display_player_form(st.session_state["player"])
-    diable = can_submit()
-
-    st.button("Submit", disabled=diable, on_click=submit_player_data)
-    st.write("> Answers can not be changed after submitting the form")
