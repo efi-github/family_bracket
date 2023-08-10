@@ -88,14 +88,13 @@ def update_player(player, live_data):
         match["status"] = get_status(match, live_match)
 
 def calculate_bracket_points(player, live_data, match_number):
-    #pprint(player)
     max_lim = int(max(list(player["matches"].keys())))
-    if match_number >= max_lim or player["matches"][match_number]["status"]=="NOT_VOTED":
+    if match_number < 0 or player["matches"][match_number]["status"]=="NOT_VOTED":
         return 1
-    next_l = match_number * 2 + 1
-    next_r = match_number * 2 + 2
-    return calculate_bracket_points(player, live_data, next_l) + calculate_bracket_points(player, live_data, next_r)
-
+    next_l = 15 - ((15-match_number) * 2 + 1)
+    next_r = 15 - ((15-match_number) * 2)
+    res = calculate_bracket_points(player, live_data, next_l) + calculate_bracket_points(player, live_data, next_r)
+    return res
 
 
 def calculate_points(player, live_data):
@@ -110,14 +109,15 @@ def calculate_points(player, live_data):
             country = m["prediction"]
             if country not in double_dict:
                 double_dict[country] = 1
+            point_cur = float(calculate_bracket_points(player, live_data, int(i)))
             double_dict[country] *= 2
             points_overview["description"].append(f"Correctly predicted {country} ({country_codes[country]}) win in: ")
             points_overview["match"].append(f"{country_codes[m['TeamA']]} vs {country_codes[m['TeamB']]}")
-            points_overview["points"].append(float(calculate_bracket_points(player, live_data, int(i))))
+            points_overview["points"].append(point_cur)
             #points_overview["points"].append(float(double_dict[country]))
             # points_overview["match points"].append(float(calculate_points_s(m, l_m)))
             # points_overview["total"].append(float(points_overview["bracket points"][-1]+points_overview["match points"][-1]))
-            points += calculate_bracket_points(player, live_data, i)
+            points += point_cur
             match_points += calculate_points_s(m, l_m)
     return points, points_overview, match_points
 def mermaid_string(key, match, live_match):
