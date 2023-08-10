@@ -118,6 +118,7 @@ def calculate_points(player, live_data):
             # points_overview["match points"].append(float(calculate_points_s(m, l_m)))
             # points_overview["total"].append(float(points_overview["bracket points"][-1]+points_overview["match points"][-1]))
             points += point_cur
+        if "submitted" in m and m["submitted"]:
             match_points += calculate_points_s(m, l_m)
     return points, points_overview, match_points
 def mermaid_string(key, match, live_match):
@@ -176,9 +177,6 @@ def calculate_points_s(match, live_match):
         diff_b = predGB - GB
         diff_pAB = predGA - predGB
         diff_AB = GA - GB
-        print(f"{predGA}:{predGB}, {GA}:{GB}")
-        print(diff_a)
-        print(diff_b)
         if diff_a == 0 and diff_b == 0:
             return 5
         if diff_pAB == diff_AB:
@@ -192,18 +190,16 @@ def display_match_predictions(player):
     res = {"game":[], "prediction":[], "result": [], "points":[]}
     for match, live_match in zip(player["matches"].values(), st.session_state["live_data"].values()):
         if "submitted" in match and match["submitted"] == True:
-            print(match)
             res["game"].append(f"{live_match['TeamA']} vs {live_match['TeamB']}")
             res["prediction"].append(f"{match['goalsAp']} : {match['goalsBp']}")
             if live_match["done"]:
                 res["result"].append(f"{live_match['goalsA']} : {live_match['goalsB']}")
             else:
                 res["result"].append(f"NA")
-            res["points"].append(str(calculate_points_s(match, live_match)))
+            res["points"].append(float(calculate_points_s(match, live_match)))
 
     df_pred = pd.DataFrame(res)
     st.dataframe(df_pred, use_container_width=True, hide_index=True)
-    return
 
 st.markdown("# Leaderboard")
 
@@ -212,12 +208,12 @@ st.markdown("# Leaderboard")
 players = load_players()
 
 live_data = load_live_data()
-leaderboard_data = {"names":[], "bracket points":[], "match points":[]}
+leaderboard_data = {"names":[], "bracket points":[], "match points":[], "total":[]}
 for name, player in players.items():
     leaderboard_data["bracket points"].append(float(calculate_points(player, live_data)[0]))
     leaderboard_data["match points"].append(float(calculate_points(player, live_data)[2]))
     leaderboard_data["names"].append(name)
-
+leaderboard_data["total"] = [sum(i) for i in zip(leaderboard_data["bracket points"], leaderboard_data["match points"] )]
 df = pd.DataFrame(leaderboard_data)
 df = df.sort_values("bracket points", ascending=False)
 df = df.reset_index(drop=True)

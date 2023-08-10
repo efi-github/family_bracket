@@ -31,9 +31,9 @@ def match_display(match, live_match):
 
     st.write(f"Match: {live_match['TeamA']} vs {live_match['TeamB']}")
     if delta < timedelta(minutes=0):
-        st.write(f"closed")
+        st.error(f"closed")
     elif delta < timedelta(minutes=30):
-        st.write(f"closes soon!")
+        st.error(f"closes soon!")
     col1, col2 = st.columns(2)
     number_a = 0
     number_b = 0
@@ -57,7 +57,8 @@ def match_display(match, live_match):
         save_state(players)
 
     st.button("Submit", disabled=disable, key = f"Match: {match['TeamA']} vs {match['TeamB']}", on_click=submit_player_data_qf)
-
+    if "submitted" in match and match["submitted"]:
+        st.success("Match submitted")
 
 
 def display_games(player, live_data, start, end):
