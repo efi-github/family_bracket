@@ -66,7 +66,7 @@ def display_games(player, live_data, start, end):
         match_display(player["matches"][i], live_data[i])
 
 
-st.write("# Guess the current Matches!")
+st.write("# Guess the current Matches ^^")
 st.text_input("Please enter a nickname to start", key="username", on_change=process_username)
 
 
