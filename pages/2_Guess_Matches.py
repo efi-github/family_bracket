@@ -73,4 +73,4 @@ st.text_input("Please enter a nickname to start", key="username", on_change=proc
 if "player" in st.session_state and len(st.session_state["username"]) >0:
     st.session_state["live_data"] = load_live_data()
     update_player()
-    display_games(st.session_state["player"],st.session_state["live_data"], 8, 12)
+    display_games(st.session_state["player"],st.session_state["live_data"], 12, 14)

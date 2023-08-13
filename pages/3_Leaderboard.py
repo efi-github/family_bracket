@@ -203,21 +203,32 @@ def display_match_predictions(player):
 
 st.markdown("# Leaderboard")
 
-
+agree = st.checkbox("also show match predictions")
 
 players = load_players()
 
-live_data = load_live_data()
-leaderboard_data = {"names":[], "bracket points":[], "match points":[], "total":[]}
-for name, player in players.items():
-    leaderboard_data["bracket points"].append(float(calculate_points(player, live_data)[0]))
-    leaderboard_data["match points"].append(float(calculate_points(player, live_data)[2]))
-    leaderboard_data["names"].append(name)
-leaderboard_data["total"] = [sum(i) for i in zip(leaderboard_data["bracket points"], leaderboard_data["match points"] )]
-df = pd.DataFrame(leaderboard_data)
-df = df.sort_values("bracket points", ascending=False)
-df = df.reset_index(drop=True)
-st.dataframe(df, use_container_width=True, hide_index=True)
+if agree:
+    live_data = load_live_data()
+    leaderboard_data = {"names":[], "bracket points":[], "match points":[], "total":[]}
+    for name, player in players.items():
+        leaderboard_data["bracket points"].append(float(calculate_points(player, live_data)[0]))
+        leaderboard_data["match points"].append(float(calculate_points(player, live_data)[2]))
+        leaderboard_data["names"].append(name)
+    leaderboard_data["total"] = [sum(i) for i in zip(leaderboard_data["bracket points"], leaderboard_data["match points"] )]
+    df = pd.DataFrame(leaderboard_data)
+    df = df.sort_values("bracket points", ascending=False)
+    df = df.reset_index(drop=True)
+    st.dataframe(df, use_container_width=True, hide_index=True)
+else:
+    live_data = load_live_data()
+    leaderboard_data = {"names": [], "bracket points": []}
+    for name, player in players.items():
+        leaderboard_data["bracket points"].append(float(calculate_points(player, live_data)[0]))
+        leaderboard_data["names"].append(name)
+    df = pd.DataFrame(leaderboard_data)
+    df = df.sort_values("bracket points", ascending=False)
+    df = df.reset_index(drop=True)
+    st.dataframe(df, use_container_width=True, hide_index=True)
 
 # Create a list of user names
 user_names = df["names"]
@@ -250,7 +261,7 @@ if len(user_names)>0:
             player_points, point_overview, match_points = calculate_points(players[selected_user], live_data)
             df_points = pd.DataFrame(point_overview)
             st.dataframe(df_points, use_container_width=True, hide_index=True)
-        if player_match_predictions(players[selected_user]):
+        if player_match_predictions(players[selected_user]) and agree:
             st.write("### Match Prediction")
             display_match_predictions(players[selected_user])
 
